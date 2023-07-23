@@ -38,7 +38,7 @@ contents = [["Red", "Red", "Space", "Space", "Space", "Space", "Blue", "Blue"],
 
 horizontal = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-game_id = "jcKLRycJ"
+game_id = "wbg3MhJW"
 
 moves = []
 lastMove = ""
