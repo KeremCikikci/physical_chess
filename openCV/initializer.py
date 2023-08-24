@@ -67,6 +67,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
 next_trigger = datetime.now()
 getMove_trigger = datetime.now()
+clock_trigger = datetime.now()
 
 arduino = serial.Serial(port='COM3', baudrate=115200, timeout=0)
 

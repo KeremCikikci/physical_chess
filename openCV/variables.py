@@ -10,6 +10,8 @@ k4 = -0.001612337
 width = 1280
 height = 720
 
+game_id = "En3TuHIv"
+
 color_threshold = .2
 
 lowerBlue_hsv = (80, 60, 50)
@@ -38,7 +40,9 @@ contents = [["Red", "Red", "Space", "Space", "Space", "Space", "Blue", "Blue"],
 
 horizontal = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-game_id = "wbg3MhJW"
-
 moves = []
 lastMove = ""
+
+time_ = "87654321"
+
+digits = ["00000011", "10011111", "00100101", "00001101", "10011001", "01001001", "01000001", "00011011", "00000001", "00001001"] # Common Anode

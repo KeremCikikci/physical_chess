@@ -15,11 +15,32 @@ from variables import *
 from initializer import *
 from functions import *
 
+SYMDETECTION = False
+
+corners = []
+
+def on_mouse_click(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        pixel_value = board[y, x]
+        corners.append(pixel_value)
+        print(f"Pixel değeri ({x}, {y}): {pixel_value}")
+
 session, client, chess_ = ini_chess()
 
 ret, board = cap.read()
 
-board, corners = findSym(board, corners)
+if SYMDETECTION:
+    board, corners = findSym(board, corners)
+else:
+    cv2.namedWindow("Fotoğraf")
+    cv2.setMouseCallback("Fotoğraf", on_mouse_click)
+
+    while True:
+        cv2.imshow("Fotoğraf", board)
+
+        # 'q' tuşuna basınca çıkış yapın
+        if len(corners) >= 4:
+            break
 
 squareWidth, squareHeight = getSize(corners)
 
@@ -103,17 +124,100 @@ def cropSquares(contents, board):
         
         contents[horizontal.index(name[0])][int(name[-1])-1] = content
     return contents
+
+def sendMessage(type, messages):
+    for m in range(1, len(messages) + 1):
+        mType = type + str(m) + " "
+        mType += messages[m-1]
+        arduino.write(bytes(mType, 'utf-8'))
+        time.sleep(.1)
+        #arduino.write(bytes("\n", 'utf-8'))
+
+def outTime(players):
+    out = ""
+    for player in players:
+        #player /= 100
+        td_str = str(timedelta(seconds=player))
+        x = td_str.split(':')
+        out += (x[1] + x[2])
+
+    print(out)
+    return out
+
+def clock(time_):
+    leds=[]
+    if len(time_) != 8:
+        print("time size does not fit in digits")
+    else:
+        for i in range(len(time_)):
+            ### DIGIT ###
+            digit = ""
+            # pre 0s
+            for pre0 in range(7-i):
+                digit += '0'
+            # 0
+            digit += '1'
+            
+            # post 0s
+            for post0 in range(8-len(digit)):
+                digit += '0'
+            
+            ### NUMBER ###
+            number = digit[::-1] + digits[int(time_[i])]
+            
+            ### binary string to decimal string conversation ###
+            integer = 0
+            for i in range(0, len(number)):
+                if number[15-i] == "1":
+                    integer += 2**i
+
+            leds.append(str(integer))
     
-#contents = cropSquares(contents, board)
+    return leds
+
+def getLastTimes(times):
+    global turn
+    print("timesssss", times)
+    if len(times) == 1:
+        player1 = times[-1]//100
+        player2 = times[-1]//100
+    else:
+        player1 = times[-1]//100
+        player2 = times[-2]//100
+
+
+    if turn:
+        turn = False
+    else:
+        turn = True
+
+    return player1, player2
+
 findContents(x1, y1, x2, y2)
 print(contents)
 preContents = []
 
+turn = True
+
+p1Time, p2Time = getLastTimes(client.games.export(game_id)["clocks"])
+
 while True:
     current_time = datetime.now()
     getMove_time = datetime.now()
-    
+    clock_time = datetime.now()
+
     read = arduino.readline()
+
+    if clock_time >= clock_trigger:
+        if turn:
+            p1Time -= 1
+        else:
+            p2Time -= 1
+        
+        time_ = outTime([p1Time, p2Time])
+        sendMessage("C", clock(time_))
+
+        clock_trigger = clock_time + timedelta(seconds=.98)
 
     # Hamle cekme
     if getMove_time >= getMove_trigger:
@@ -139,7 +243,8 @@ while True:
             contents[letterT][numberT] = "Red"
             preContents = copy.deepcopy(contents)
             changes=[]
-            #chess_.push_uci(move)
+            p1Time, p2Time = getLastTimes(client.games.export(game_id)["clocks"])
+            turn = False
 
     if str(read[0:4]) == "b'move'" and current_time >= next_trigger:
         next_trigger = current_time + timedelta(seconds=.9)
@@ -158,80 +263,11 @@ while True:
             print("kendi hamlen: ", move)
             try:
                 berserk.clients.Board(session=session).make_move(game_id, move)
-                time.sleep(8)
+                #time.sleep(8)
+                p1Time, p2Time = getLastTimes(client.games.export(game_id)["clocks"])
+                turn = True
             except:
                 print('hata')
-
-
-#     # if getMove_time >= getMove_trigger and chess_.turn == chess.WHITE:
-#     #     moves_ = client.games.export(game_id)['moves']
-#     #     moves = moves_.split()
-#     #     getMove_trigger = getMove_time + timedelta(seconds=.7)
-        
-#     #     if len(moves) % 2 == 1:
-#     #         lastMove = moves[-1]
-
-#     #         # Rakip oynamasi
-#     #         try:
-#     #             moves_ = client.games.export(game_id)['moves']
-#     #             moves = moves_.split()
-#     #             uci_move = chess_.push_san(moves[-1]).uci()
-#     #         except:
-#     #             chess_.turn = chess.BLACK
-#     #         print("rakip oynuyor: ", uci_move)
-
-#     #         from_ = uci_move[:2]
-#     #         to_ = uci_move[-2:]
-
-#     #         letterF = horizontal.index(from_[0])
-#     #         numberF = int(from_[-1]) - 1
-#     #         letterT = horizontal.index(to_[0])
-#     #         numberT = int(to_[-1]) - 1
-
-#     #         contents[letterF][numberF] = "Space"
-#     #         contents[letterT][numberT] = "Red"
-            
-#     #         print(contents)
-        
-
-#     # if str(read[0:4]) == "b'move'" and current_time >= next_trigger and chess_.turn == chess.BLACK:
-#     #     next_trigger = current_time + timedelta(seconds=.9)
-        
-#     #     ret, board = cap.read()
-
-#     #     board = fisheye_correction(board, fx, fy, cx, cy, k1, k2, k3, k4)
-
-#     #     preContents = copy.deepcopy(contents)
-
-#     #     contents = cropSquares(contents)
-
-#     #     # önceki hali ile karsilastir
-#     #     changes = getChanges(preContents, contents)
-#     #     print("changes: ", changes)
-#     #     if len(changes) == 2:
-#     #         # hamle kodunu olustur
-#     #         move = getMove(changes)
-#     #         print("kendi hamlen: ", move)
-            
-#     #         try:
-#     #             berserk.clients.Board(session=session).make_move(game_id, move)
-#     #             moves_ = client.games.export(game_id)['moves']
-#     #             moves = moves_.split()
-#     #             chess_.push_uci(move)
-                
-#     #             print(contents)
-#     #         except:
-#     #             print("yanlis hamle tespiti")
-
-#     #             # önceki hali ile karsilastir
-#     #             changes = getChanges(preContents, contents)
-#     #             print("pre: ", preContents)
-#     #             print("con: ", contents)
-#     #             print("changes: ", changes)
-                
-#     if cv2.waitKey(1) & 0xFF == ord('q'):
-#         break
-
 
 cap.release()
 cv2.destroyAllWindows()

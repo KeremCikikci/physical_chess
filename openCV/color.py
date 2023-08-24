@@ -11,7 +11,7 @@ upperRed_hsv = (5, 3, 50)#(60, 250, 255)
 
 # resmi ac
 #source = "assets/2.jpg"
-source = "crop/a7.jpg"
+source = "../assets/a7.jpg"
 board = cv2.imread(source)
 
 mask_blue = cv2.inRange(board, lowerBlue_hsv, upperBlue_hsv)
