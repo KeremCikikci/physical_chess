@@ -5,13 +5,13 @@ content = None
 threshold = .1
 
 lowerBlue_hsv = (100, 115, 70) # (100, 120, 50)
-upperBlue_hsv = (130, 185, 255)
+upperBlue_hsv = (130, 185, 255)# (130, 185, 255)
 lowerRed_hsv = (150, 120, 60) # (0, 10, 0)
 upperRed_hsv = (250, 195, 250)
 
 # resmi ac
 #source = "assets/2.jpg"
-source = "assets/a.jpg"
+source = "assets/h1.jpg"
 board = cv2.imread(source)
 
 mask_blue = cv2.inRange(board, lowerBlue_hsv, upperBlue_hsv)

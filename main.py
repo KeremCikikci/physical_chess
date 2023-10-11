@@ -16,30 +16,13 @@ init(autoreset=True)
 SYMDETECTION = False
 SELECTBOARD = False
 
-gameID = 'kbAQdU4s'
+gameID = 'Gr1QuKkK'
 
 width = 1280
 height = 720
 
 if SYMDETECTION:
     model = YOLO('weights/best.pt')
-
-# clock
-# clocks = client.games.export(gameID)["clocks"]
-
-# whiteClock = None
-# blackClock = None
-
-# if len(clocks) >= 2:
-#     if len(clocks) % 2 == 0:
-#         whiteClock = clocks[-2] // 100
-#         blackClock = clocks[-1] // 100
-#     else:
-#         whiteClock = clocks[-1] // 100
-#         blackClock = clocks[-2] // 100
-
-#     clock = str(whiteClock) + str(blackClock)
-#     arduino.write(bytes(clock, 'utf-8'))
 
 contents = [["BLACK", "BLACK", "SPACE", "SPACE", "SPACE", "SPACE", "WHITE", "WHITE"],
             ["BLACK", "BLACK", "SPACE", "SPACE", "SPACE", "SPACE", "WHITE", "WHITE"],
@@ -354,7 +337,7 @@ def on_mouse_click(event, x, y, flags, param):
 
 # Foto cekme
 try:
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
@@ -363,7 +346,7 @@ try:
     board = fisheye_correction(board, fx, fy, cx, cy, k1, k2, k3, k4)
     cv2.imwrite("board.jpg", board)
 except:
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     ret, board = cap.read()
     cv2.imwrite("board.jpg", board)
