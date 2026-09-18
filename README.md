@@ -63,3 +63,5 @@ register chips, the data is transmitted using only 3 wires. The shift registers 
 light up the required LEDs in each segment of the display. This process happens so quickly that 
 the human eye perceives the LEDs as lit simultaneously.
 
+# Complete Documentation
+[RoboChess_ Digitalisierung auf dem Schachbrett.pdf](https://github.com/user-attachments/files/32381137/RoboChess_.Digitalisierung.auf.dem.Schachbrett.pdf)
